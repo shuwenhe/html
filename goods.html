@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>商品列表</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>商品信息</h1>
+  <div id="status">加载中...</div>
+  <table id="goodsTable" style="display: none;">
+    <thead>
+      <tr>
+        <th>名称</th>
+        <th>描述</th>
+        <th>价格</th>
+      </tr>
+    </thead>
+    <tbody id="goodsBody">
+      <!-- 数据将插入在这里 -->
+    </tbody>
+  </table>
+
+  <script>
+    fetch('https://xstiku.com/getUserData')
+      .then(response => response.json())
+      .then(data => {
+        const statusDiv = document.getElementById("status");
+
+        if (data.status !== "success") {
+          statusDiv.innerHTML = `<span class="error">获取数据失败：${data.message}</span>`;
+          return;
+        }
+
+        const goods = data.data;
+        const tbody = document.getElementById("goodsBody");
+
+        goods.forEach(item => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.description}</td>
+            <td>${item.price}</td>
+          `;
+          tbody.appendChild(row);
+        });
+
+        document.getElementById("goodsTable").style.display = "table";
+        statusDiv.innerText = "加载成功，共 " + goods.length + " 项商品";
+      })
+      .catch(error => {
+        document.getElementById("status").innerHTML = `<span class="error">请求失败: ${error.message}</span>`;
+      });
+  </script>
+
+</body>
+</html>
